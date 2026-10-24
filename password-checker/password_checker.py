@@ -38,15 +38,20 @@ def score_password(pw):
     else:
         hints.append("add a lowercase letter")
 
-    if any(c.isdigit() for c in pw):
-        score += 1
+    # long passwords don't need numbers and special chars to be strong,
+    # a 16+ char passphrase is way better than a short password with symbols
+    if len(pw) >= 16:
+        score += 2
     else:
-        hints.append("add a number")
+        if any(c.isdigit() for c in pw):
+            score += 1
+        else:
+            hints.append("add a number")
 
-    if any(c in SPECIALS for c in pw):
-        score += 1
-    else:
-        hints.append("add a special character like ! or #")
+        if any(c in SPECIALS for c in pw):
+            score += 1
+        else:
+            hints.append("add a special character like ! or #")
 
     if score > 5:
         score = 5
@@ -88,8 +93,9 @@ def main():
     pw = input("password to check: ")
     score, hints = score_password(pw)
     print(f"\nscore: {score}/5  ->  {verdict(score)}")
-    for h in hints:
-        print(" -", h)
+    if score < 5:
+        for h in hints:
+            print(" -", h)
 
 
 main()
